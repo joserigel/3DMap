@@ -1,7 +1,7 @@
 using System.Text;
 using OpenTK.Graphics.OpenGL4;
 
-namespace ParticleVoxel {
+namespace Engine {
     class Shader {
         private int handler;
         public int Handler {
@@ -59,13 +59,17 @@ namespace ParticleVoxel {
             }
 
             //Delete shaders {not used anymore}
-            /*GL.DetachShader(handler, vertShaderHandler);
+            GL.DetachShader(handler, vertShaderHandler);
             GL.DetachShader(handler, fragShaderHandler);
             GL.DeleteShader(vertShaderHandler);
-            GL.DeleteShader(fragShaderHandler); */
+            GL.DeleteShader(fragShaderHandler);
         }
         public void Use() {
             GL.UseProgram(handler);
+        }
+
+        ~Shader() {
+            GL.DeleteProgram(handler);
         }
     }
 }
