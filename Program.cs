@@ -6,7 +6,7 @@ namespace Engine {
         public static int Main() {
             NativeWindowSettings nativeWindowSettings = new NativeWindowSettings();
             nativeWindowSettings.Size = new Vector2i(800, 600);
-            nativeWindowSettings.Title = "Testing";
+            nativeWindowSettings.Title = "3D Map";
 
             using (Window window = new Window(GameWindowSettings.Default, nativeWindowSettings)) {
                 window.Run();

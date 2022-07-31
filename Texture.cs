@@ -1,8 +1,6 @@
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+using StbImageSharp;
 
 
 namespace Engine 
@@ -20,7 +18,7 @@ namespace Engine
         public int Unit {
             get => unit;
         }
-        public Texture() 
+        public Texture(string path) 
         {
             //Generate and Bind Texture, set unit
             handler = GL.GenTexture();
@@ -42,17 +40,20 @@ namespace Engine
             GL.TexParameter(TextureTarget.Texture2D,
                 TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             
-            //Load and Mutate Texture
-            Image<Rgba32> image = Image.Load<Rgba32>("texture.png");
-            image.Mutate(x => x.Flip(FlipMode.Vertical));
-
-            //Get Bytes of img
-            byte[] pixels = new byte[4 * image.Width * image.Height];
-            image.CopyPixelDataTo(pixels);
+            //Get Image Bytes
+            byte[] pixels;
+            int width, height;
+            using (FileStream stream = File.OpenRead(path)) {
+                StbImage.stbi_set_flip_vertically_on_load(1);
+                ImageResult image = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
+                pixels = image.Data;
+                width = image.Width;
+                height = image.Height;
+            }
             
             //Set Image Data
             GL.TexImage2D(TextureTarget.Texture2D, 0,
-                PixelInternalFormat.Rgba, image.Width, image.Height, 0, 
+                PixelInternalFormat.Rgba, width, height, 0, 
                 PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
 
             GL.ActiveTexture(TextureUnit.Texture0 + unit);

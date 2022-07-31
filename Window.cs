@@ -33,9 +33,7 @@ namespace Engine {
         {
             base.OnLoad();
 
-            CursorGrabbed = true;
-
-            
+            CursorState = CursorState.Grabbed;
 
             //Set Clear Color
             GL.ClearColor(0.1f, 0.15f, 0.2f, 1.0f);
@@ -64,7 +62,7 @@ namespace Engine {
             GL.EnableVertexAttribArray(1);
 
             //Set Texture
-            texture = new Texture(); 
+            texture = new Texture("images/color_2k.jpg"); 
             GL.ActiveTexture(TextureUnit.Texture0 + texture.Unit);
             GL.BindTexture(TextureTarget.Texture2D, texture.Handler);
             
@@ -77,13 +75,13 @@ namespace Engine {
             Matrix4 projection = camera.CameraMatrix;
             Matrix4 view = camera.View;
 
+            //Set Uniforms
             int location = GL.GetUniformLocation(shader.Handler, "texture0"); 
             GL.Uniform1(location, texture.Unit);
             location = GL.GetUniformLocation(shader.Handler, "projection");
             GL.UniformMatrix4(location, true, ref projection);
             location = GL.GetUniformLocation(shader.Handler, "view");
             GL.UniformMatrix4(location, true, ref view);
-
         }
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
