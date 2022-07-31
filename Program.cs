@@ -8,7 +8,6 @@ namespace Engine {
             nativeWindowSettings.Size = new Vector2i(800, 600);
             nativeWindowSettings.Title = "Testing";
 
-
             using (Window window = new Window(GameWindowSettings.Default, nativeWindowSettings)) {
                 window.Run();
             }
@@ -16,4 +15,3 @@ namespace Engine {
         }
     }
 }
-

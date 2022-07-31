@@ -58,7 +58,7 @@ namespace Engine {
                 Console.WriteLine(infoLog);
             }
 
-            //Delete shaders {not used anymore}
+            //Delete shaders 
             GL.DetachShader(handler, vertShaderHandler);
             GL.DetachShader(handler, fragShaderHandler);
             GL.DeleteShader(vertShaderHandler);

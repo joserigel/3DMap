@@ -5,7 +5,10 @@ layout (location = 1) in vec2 aUV;
 
 out vec2 texCoord;
 
+uniform mat4 projection;
+uniform mat4 view;
+
 void main() {
     texCoord = aUV;
-    gl_Position = vec4(aPosition, 1.0f);
+    gl_Position = vec4(aPosition, 1.0) * view * projection;
 }
