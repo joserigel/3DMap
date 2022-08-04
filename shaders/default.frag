@@ -8,5 +8,7 @@ uniform sampler2D texture0;
 
 void main() 
 {
-    FragColor = texture(texture0, texCoord);
+    float dirLight = max(dot(normal, normalize(vec3(1.0, 1.0, 0.0))), 0.0);
+    FragColor = texture(texture0, texCoord) * dirLight;
+    //FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 }

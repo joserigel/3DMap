@@ -9,7 +9,7 @@ using OpenTK.Mathematics;
 namespace Engine {
     public class Window : GameWindow 
     {
-        private readonly float[] vertices = 
+        private float[] vertices = 
         {
             //Coordinates           //UV            //Normals
             -0.5f, -0.5f, 0.0f,     0.0f, 0.0f,     0.0f, 0.0f, 1.0f,
@@ -17,11 +17,12 @@ namespace Engine {
             -0.5f,  0.5f, 0.0f,     0.0f, 1.0f,     0.0f, 0.0f, 1.0f,
              0.5f,  0.5f, 0.0f,     1.0f, 1.0f,     0.0f, 0.0f, 1.0f,
         };
-        private readonly uint[] indices = 
+        private uint[] indices = 
         {
             0, 3, 1,
             0, 2, 3
         };
+        private Geometry sphere;
         private int vao, vbo, ebo;
         private Shader shader;
         private Texture texture;
@@ -34,7 +35,14 @@ namespace Engine {
         {
             base.OnLoad();
 
+            
+
             CursorState = CursorState.Grabbed;
+
+            //Generate Sphere
+            sphere = Geometry.CreateSphere(8.0f, 32, 16);
+            vertices = sphere.Vertices;
+            indices = sphere.Indices;
 
             //Set Clear Color
             GL.ClearColor(0.1f, 0.15f, 0.2f, 1.0f);
@@ -75,6 +83,7 @@ namespace Engine {
             camera = new Camera(this.Size.X, this.Size.Y);
             Matrix4 projection = camera.CameraMatrix;
             Matrix4 view = camera.View;
+            Matrix4 model = Matrix4.Identity;
 
             //Set Uniforms
             int location = GL.GetUniformLocation(shader.Handler, "texture0"); 
@@ -83,6 +92,11 @@ namespace Engine {
             GL.UniformMatrix4(location, true, ref projection);
             location = GL.GetUniformLocation(shader.Handler, "view");
             GL.UniformMatrix4(location, true, ref view);
+            location = GL.GetUniformLocation(shader.Handler, "model");
+            GL.UniformMatrix4(location, true, ref model);
+            
+            //Enable Depth Test
+            GL.Enable(EnableCap.DepthTest);
         }
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
@@ -91,10 +105,14 @@ namespace Engine {
             Matrix4 projection = camera.CameraMatrix;
             Matrix4 view = camera.View;
 
+            
             int location = GL.GetUniformLocation(shader.Handler, "projection");
             GL.UniformMatrix4(location, true, ref projection);
             location = GL.GetUniformLocation(shader.Handler, "view");
             GL.UniformMatrix4(location, true, ref view);
+            location = GL.GetUniformLocation(shader.Handler, "model");
+
+            
 
             //Closes when escape key is pressed
             if (KeyboardState.IsKeyDown(Keys.Escape)) {
@@ -108,13 +126,18 @@ namespace Engine {
         protected override void OnRenderFrame(FrameEventArgs args)
         {
             base.OnRenderFrame(args);
+            //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
             GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.Clear(ClearBufferMask.DepthBufferBit);
 
             GL.UseProgram(shader.Handler);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer,  ebo);
             GL.BindVertexArray(vao);
-            GL.DrawElements(PrimitiveType.Triangles, indices.Length, 
-                DrawElementsType.UnsignedInt, 0);
+
+            
+            GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
+            
+                
             Context.SwapBuffers();
         }
 
