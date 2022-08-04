@@ -11,10 +11,11 @@ namespace Engine {
     {
         private readonly float[] vertices = 
         {
-            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-             0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-            -0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
-             0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+            //Coordinates           //UV            //Normals
+            -0.5f, -0.5f, 0.0f,     0.0f, 0.0f,     0.0f, 0.0f, 1.0f,
+             0.5f, -0.5f, 0.0f,     1.0f, 0.0f,     0.0f, 0.0f, 1.0f,
+            -0.5f,  0.5f, 0.0f,     0.0f, 1.0f,     0.0f, 0.0f, 1.0f,
+             0.5f,  0.5f, 0.0f,     1.0f, 1.0f,     0.0f, 0.0f, 1.0f,
         };
         private readonly uint[] indices = 
         {
@@ -54,12 +55,12 @@ namespace Engine {
             //Generate Vertex Array Object
             vao = GL.GenVertexArray();
             GL.BindVertexArray(vao);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, 
-                false, 5 * sizeof(float), 0);
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false,
-            5 * sizeof(float), 3 * sizeof(float));
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 0);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 8 * sizeof(float), 3 * sizeof(float));
+            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 5 * sizeof(float));
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
+            GL.EnableVertexAttribArray(2);
 
             //Set Texture
             texture = new Texture("images/color_2k.jpg"); 
