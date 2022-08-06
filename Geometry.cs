@@ -41,7 +41,7 @@ namespace Engine {
             //Middle Vertices
             for (uint i=0; i<rings-2; i++) {
                 float y = MathF.Sin(pitch);
-                float uvY = (y + 1) / 2;
+                float uvY = uvYSegment * (i + 1);
                 Console.WriteLine(uvY);
                 for (uint j=0; j<=segments; j++) {
                     //Trignometry Calculations
