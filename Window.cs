@@ -123,7 +123,7 @@ namespace Engine {
         protected override void OnRenderFrame(FrameEventArgs args)
         {
             base.OnRenderFrame(args);
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.Clear(ClearBufferMask.DepthBufferBit);
 

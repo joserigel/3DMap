@@ -12,17 +12,22 @@ namespace Engine {
             float uvXFan = 1 / ((float)segments - 1); 
             float uvYSegment = 1 / ((float)rings - 2);
 
+            float yaw = (MathF.PI * 2) / segments;
+            float pitchAdd = MathF.PI / ((float)rings - 1);
+            float pitch = -(MathF.PI/2f) + pitchAdd;
+
             uint idx = 0;
 
             //Bottom Vertices
             for (int i=0; i<segments; i++)  {
+
                 //Coordinates
-                vertices[idx] = (i * radius) + radius/2;
+                vertices[idx] = 0f;
                 vertices[idx + 1] = -radius;
                 vertices[idx + 2] = 0f;
 
                 //UV
-                vertices[idx + 3] = i * uvXFan;
+                vertices[idx + 3] = 1 - (i * uvXFan);
                 vertices[idx + 4] = 0f;
 
                 //Normals
@@ -35,34 +40,46 @@ namespace Engine {
 
             //Middle Vertices
             for (uint i=0; i<rings-2; i++) {
+                float y = MathF.Sin(pitch);
+                float uvY = (y + 1) / 2;
+                Console.WriteLine(uvY);
                 for (uint j=0; j<=segments; j++) {
+                    //Trignometry Calculations
+                    float xTrig = MathF.Cos(yaw * j);
+                    float yTrig = MathF.Cos(pitch);
+                    float zTrig = MathF.Sin(yaw * j);
+
+                    float x = xTrig * yTrig;
+                    float z = zTrig * yTrig;
+
                     //Coordinates
-                    vertices[idx] = j * radius;
-                    vertices[idx + 1] = -radius + ((i + 1) * radius);
-                    vertices[idx + 2] = 0f;
+                    vertices[idx] = x * radius;
+                    vertices[idx + 1] = y * radius;
+                    vertices[idx + 2] = z * radius;
 
                     //UV
-                    vertices[idx + 3] = j * uvXSegment;
-                    vertices[idx + 4] = (i + 1) * uvYSegment;
+                    vertices[idx + 3] = 1 - (j * uvXSegment);
+                    vertices[idx + 4] = uvY;
 
                     //Normals
-                    vertices[idx + 5] = 0f;
-                    vertices[idx + 6] = 0f;
-                    vertices[idx + 7] = 0f;
+                    vertices[idx + 5] = x;
+                    vertices[idx + 6] = y;
+                    vertices[idx + 7] = z;
 
                     idx += 8;
                 }
+                pitch += pitchAdd;
             }
 
             //Top Vertices
             for (int i=0; i<segments; i++) {
                 //Coordinates
-                vertices[idx] = (i * radius) + radius/2;
-                vertices[idx + 1] = radius * 8;
+                vertices[idx] = 0f;
+                vertices[idx + 1] = radius;
                 vertices[idx + 2] = 0f;
 
                 //UV
-                vertices[idx + 3] = i * uvXFan;
+                vertices[idx + 3] = 1 - (i * uvXFan);
                 vertices[idx + 4] = 1f;
 
                 //Normals
@@ -121,7 +138,7 @@ namespace Engine {
             }
             
             
-            
+            /*
             for (int i=0; i<vertices.Length; i+=8) {
                 Console.WriteLine(i+": "+vertices[i]+", "+vertices[i + 1]+", "+vertices[i + 2]);
             }
@@ -129,7 +146,7 @@ namespace Engine {
             for (int i=0; i<indices.Length; i+=3) {
                 Console.WriteLine(i+": "+indices[i]+", "+indices[i + 1]+", "+indices[i + 2]);
             }
-            /*
+            
             //Calculate Vertices
             float[] vertices = new float[
                 ((rings) * (segments + 1) * 8)
