@@ -4,6 +4,132 @@ namespace Engine {
         public static Geometry CreateSphere(float diameter, uint segments, uint rings) {
             float radius = diameter / 2;
 
+            float[] vertices = new float[
+                (((rings - 2) * (segments + 1)) + (2 * segments))  * 8
+            ];
+            
+            float uvXSegment = 1 / (float)segments;
+            float uvXFan = 1 / ((float)segments - 1); 
+            float uvYSegment = 1 / ((float)rings - 2);
+
+            uint idx = 0;
+
+            //Bottom Vertices
+            for (int i=0; i<segments; i++)  {
+                //Coordinates
+                vertices[idx] = (i * radius) + radius/2;
+                vertices[idx + 1] = -radius;
+                vertices[idx + 2] = 0f;
+
+                //UV
+                vertices[idx + 3] = i * uvXFan;
+                vertices[idx + 4] = 0f;
+
+                //Normals
+                vertices[idx + 5] = 0f;
+                vertices[idx + 6] = 0f;
+                vertices[idx + 7] = 0f;
+
+                idx += 8;
+            }
+
+            //Middle Vertices
+            for (uint i=0; i<rings-2; i++) {
+                for (uint j=0; j<=segments; j++) {
+                    //Coordinates
+                    vertices[idx] = j * radius;
+                    vertices[idx + 1] = -radius + ((i + 1) * radius);
+                    vertices[idx + 2] = 0f;
+
+                    //UV
+                    vertices[idx + 3] = j * uvXSegment;
+                    vertices[idx + 4] = (i + 1) * uvYSegment;
+
+                    //Normals
+                    vertices[idx + 5] = 0f;
+                    vertices[idx + 6] = 0f;
+                    vertices[idx + 7] = 0f;
+
+                    idx += 8;
+                }
+            }
+
+            //Top Vertices
+            for (int i=0; i<segments; i++) {
+                //Coordinates
+                vertices[idx] = (i * radius) + radius/2;
+                vertices[idx + 1] = radius * 8;
+                vertices[idx + 2] = 0f;
+
+                //UV
+                vertices[idx + 3] = i * uvXFan;
+                vertices[idx + 4] = 1f;
+
+                //Normals
+                vertices[idx + 5] = 0f;
+                vertices[idx + 6] = 0f;
+                vertices[idx + 7] = 0f;
+
+                idx += 8;
+            }
+
+            uint[] indices = new uint[
+                ((rings - 3) * segments * 6) + (2 * segments * 3)
+            ];
+            
+            idx = 0; uint offset = 0;
+
+            //Bottom Triangles
+            for (int i=0; i<segments; i++) {
+                indices[idx] = offset;
+                indices[idx + 1] = offset + segments;
+                indices[idx + 2] = offset + segments + 1;
+
+                idx+=3;
+                offset++;
+            }
+            
+            //Middle Triangles
+            for (int i=0; i<rings-3; i++) {
+                for (int j=0; j<segments; j++) {
+                    indices[idx] = offset;
+                    indices[idx + 1] = offset + segments + 1;
+                    indices[idx + 2] = offset + 1;
+
+                    indices[idx + 3] = offset + 1;
+                    indices[idx + 4] = offset + segments + 1;
+                    indices[idx + 5] = offset + segments + 2;
+
+                    idx+=6;
+                    offset++;
+                }
+                offset++;
+            }
+            
+            
+
+            //Top Triangles
+            idx = (uint)indices.Length - (segments * 3);
+            offset = (uint)(vertices.Length/8) - segments - segments - 1;
+            for (int i=0; i<segments; i++) {
+                indices[idx] = offset;
+                indices[idx + 1] = offset + segments + 1;
+                indices[idx + 2] = offset + 1;
+                
+                idx +=3;
+                offset++;
+            }
+            
+            
+            
+            for (int i=0; i<vertices.Length; i+=8) {
+                Console.WriteLine(i+": "+vertices[i]+", "+vertices[i + 1]+", "+vertices[i + 2]);
+            }
+            Console.WriteLine("====================================");
+            for (int i=0; i<indices.Length; i+=3) {
+                Console.WriteLine(i+": "+indices[i]+", "+indices[i + 1]+", "+indices[i + 2]);
+            }
+            /*
             //Calculate Vertices
             float[] vertices = new float[
                 ((rings) * (segments + 1) * 8)
@@ -20,7 +146,9 @@ namespace Engine {
             //Bottom Vertex
             for (uint i=0; i<=segments; i++) {
                 //Coordinates
-                vertices[(i * 8) + 1] = -radius;
+                vertices[i * 8] = i * radius;
+                vertices[(i * 8) + 1] = - 16f;
+                vertices[(i * 8) + 2] = 10f;
                 
                 //UV
                 vertices[(i * 8) + 3] = uvXSegment * i;
@@ -45,9 +173,9 @@ namespace Engine {
                     float x = xTrig * yTrig;
                     float z = zTrig * yTrig;
                     //Coordinates
-                    vertices[idx] = x * radius;
-                    vertices[idx + 1] = y * radius;
-                    vertices[idx + 2] = z * radius;
+                    vertices[idx] = j * radius;
+                    vertices[idx + 1] = i * radius;
+                    vertices[idx + 2] = 0 * radius;
 
                     //UV
                     vertices[idx + 3] = uvXSegment * j;
@@ -65,8 +193,10 @@ namespace Engine {
 
             //Top Vertex
             for (int i=0; idx<vertices.Length; idx+=8, i++) {
-                //Coordinates
-                vertices[idx + 1] = radius;
+                vertices[idx] = i * radius;
+                vertices[idx + 1] = 30f;
+                vertices[idx + 2] = 10f;
+                
                 
                 //UV
                 vertices[idx + 3] = uvXSegment * i;
@@ -98,7 +228,6 @@ namespace Engine {
 
 
             //Tracing!!!!!!
-            /*
             for (int i=0; i<indices.Length; i+=3) {
                 Console.WriteLine(string.Format("{0}: {1}, {2}, {3}",
                     i/3,
@@ -106,8 +235,8 @@ namespace Engine {
                     indices[i + 1],
                     indices[i + 2]
                 ));
-            }*/
-            
+            }
+            Console.WriteLine("==================================");
             for (int i=0; i<vertices.Length; i+=8) {
                 Console.WriteLine(string.Format("{0}:\t{1:0.##}, {2:0.##}, {3:0.##}  \t\t\t{4:0.##},{5:0.##}\t\t{6:0.##},{7:0.##},{8:0.##}",
                     i/8,
@@ -120,7 +249,7 @@ namespace Engine {
                     vertices[i + 6],
                     vertices[i + 7]
                 ));
-            }
+            }*/
             return new Geometry(vertices, indices);
         } 
 

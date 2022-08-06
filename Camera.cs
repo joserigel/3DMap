@@ -11,7 +11,7 @@ namespace Engine
     {
         private static Vector3 up = Vector3.UnitY;
         private static Vector3 right = Vector3.UnitX;
-        private float fov = 65, speed = 1.5f, sens = 0.1f;
+        private float fov = 65, speed = 10f, sens = 27f;
         private float lookX, lookY;
         private Vector3 position, front;
         private Matrix4 cameraMatrix, view;
@@ -53,11 +53,11 @@ namespace Engine
             lookX += mouseState.Delta.X * sens * deltaTime;
             lookY += mouseState.Delta.Y * sens * deltaTime;
 
-            lookY = Math.Clamp(lookY, -90f, 90f);
+            lookY = Math.Clamp(lookY, -89f, 89f);
 
             Vector4 lookDir = -Vector4.UnitZ 
-                * Matrix4.CreateFromAxisAngle(Vector3.UnitX, -lookY)
-                * Matrix4.CreateFromAxisAngle(up, -lookX);
+                * Matrix4.CreateFromAxisAngle(Vector3.UnitX, -lookY * MathF.PI / 180f)
+                * Matrix4.CreateFromAxisAngle(up, -lookX * MathF.PI / 180f);
             front = new Vector3(
                 lookDir.X,
                 lookDir.Y,

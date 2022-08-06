@@ -34,13 +34,10 @@ namespace Engine {
         protected override void OnLoad()
         {
             base.OnLoad();
-
-            
-
             CursorState = CursorState.Grabbed;
 
             //Generate Sphere
-            sphere = Geometry.CreateSphere(8.0f, 32, 16);
+            sphere = Geometry.CreateSphere(5.0f, 8, 8);
             vertices = sphere.Vertices;
             indices = sphere.Indices;
 
@@ -126,7 +123,7 @@ namespace Engine {
         protected override void OnRenderFrame(FrameEventArgs args)
         {
             base.OnRenderFrame(args);
-            //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.Clear(ClearBufferMask.DepthBufferBit);
 
@@ -136,6 +133,10 @@ namespace Engine {
 
             
             GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
+            
+
+            
+            
             
                 
             Context.SwapBuffers();
