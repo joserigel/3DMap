@@ -23,9 +23,10 @@ namespace Engine {
             0, 2, 3
         };
         private Geometry sphere;
+        private float angle;
         private int vao, vbo, ebo;
         private Shader shader;
-        private Texture texture;
+        private Texture colorMap, bumpMap;
         private Camera camera;
         public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) 
         {
@@ -37,7 +38,7 @@ namespace Engine {
             CursorState = CursorState.Grabbed;
 
             //Generate Sphere
-            sphere = Geometry.CreateSphere(5.0f, 8, 8);
+            sphere = Geometry.CreateSphere(5.0f, 64, 64);
             vertices = sphere.Vertices;
             indices = sphere.Indices;
 
@@ -68,9 +69,8 @@ namespace Engine {
             GL.EnableVertexAttribArray(2);
 
             //Set Texture
-            texture = new Texture("images/color_2k.jpg"); 
-            GL.ActiveTexture(TextureUnit.Texture0 + texture.Unit);
-            GL.BindTexture(TextureTarget.Texture2D, texture.Handler);
+            colorMap = new Texture("images/color_2k.jpg"); 
+            bumpMap = new Texture("images/bump_8k.jpg"); 
             
             //Instantiate Shader
             shader = new Shader("shaders/default.vert", "shaders/default.frag");
@@ -81,16 +81,38 @@ namespace Engine {
             Matrix4 projection = camera.CameraMatrix;
             Matrix4 view = camera.View;
             Matrix4 model = Matrix4.Identity;
-
+            
+            //Set Textures
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, colorMap.Handler);
+            int location = GL.GetUniformLocation(shader.Handler, "colorMap"); 
+            GL.Uniform1(location, 0);
+            GL.ActiveTexture(TextureUnit.Texture1);
+            GL.BindTexture(TextureTarget.Texture2D, bumpMap.Handler);
+            location = GL.GetUniformLocation(shader.Handler, "bumpMap");
+            GL.Uniform1(location, 1);
+            
             //Set Uniforms
-            int location = GL.GetUniformLocation(shader.Handler, "texture0"); 
-            GL.Uniform1(location, texture.Unit);
             location = GL.GetUniformLocation(shader.Handler, "projection");
             GL.UniformMatrix4(location, true, ref projection);
             location = GL.GetUniformLocation(shader.Handler, "view");
             GL.UniformMatrix4(location, true, ref view);
             location = GL.GetUniformLocation(shader.Handler, "model");
             GL.UniformMatrix4(location, true, ref model);
+
+            //Set Uniform Constants
+            location = GL.GetUniformLocation(shader.Handler, "bumpIntensity");
+            GL.Uniform1(location, 0.1f);
+
+            //Set Light Direction
+            angle = 45f;
+            Vector3 lightDir = new Vector3(
+                MathF.Cos(angle * MathF.PI / 180f),
+                0f,
+                MathF.Sin(angle * MathF.PI / 180f)
+            );
+            location = GL.GetUniformLocation(shader.Handler, "lightDir");
+            GL.Uniform3(location, ref lightDir);
             
             //Enable Depth Test
             GL.Enable(EnableCap.DepthTest);
@@ -102,14 +124,24 @@ namespace Engine {
             Matrix4 projection = camera.CameraMatrix;
             Matrix4 view = camera.View;
 
-            
+            //Update View
             int location = GL.GetUniformLocation(shader.Handler, "projection");
             GL.UniformMatrix4(location, true, ref projection);
             location = GL.GetUniformLocation(shader.Handler, "view");
             GL.UniformMatrix4(location, true, ref view);
             location = GL.GetUniformLocation(shader.Handler, "model");
 
-            
+            //Calculate Sun Direction
+            angle += 15f * (float)args.Time;
+            while (angle >= 360f) angle -= 360f;
+            while (angle < 0) angle += 360f;
+            Vector3 lightDir = new Vector3(
+                MathF.Cos(angle * MathF.PI / 180f),
+                0f,
+                MathF.Sin(angle * MathF.PI / 180f)
+            );
+            location = GL.GetUniformLocation(shader.Handler, "lightDir");
+            GL.Uniform3(location, ref lightDir);
 
             //Closes when escape key is pressed
             if (KeyboardState.IsKeyDown(Keys.Escape)) {
@@ -130,7 +162,7 @@ namespace Engine {
             GL.UseProgram(shader.Handler);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer,  ebo);
             GL.BindVertexArray(vao);
-
+            
             
             GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
             

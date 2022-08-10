@@ -56,8 +56,7 @@ namespace Engine
                 PixelInternalFormat.Rgba, width, height, 0, 
                 PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
 
-            GL.ActiveTexture(TextureUnit.Texture0 + unit);
-            
+            GL.BindTexture(TextureTarget.Texture2D, 0);
         }
     }
 }

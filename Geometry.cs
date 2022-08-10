@@ -60,7 +60,7 @@ namespace Engine {
                     //UV
                     vertices[idx + 3] = 1 - (j * uvXSegment);
                     vertices[idx + 4] = uvY;
-
+                    
                     //Normals
                     vertices[idx + 5] = x;
                     vertices[idx + 6] = y;
@@ -84,7 +84,7 @@ namespace Engine {
 
                 //Normals
                 vertices[idx + 5] = 0f;
-                vertices[idx + 6] = 0f;
+                vertices[idx + 6] = 1f;
                 vertices[idx + 7] = 0f;
 
                 idx += 8;
